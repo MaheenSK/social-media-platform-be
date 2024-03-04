@@ -1,0 +1,65 @@
+
+enum Gender{
+  M
+  F
+  O
+}
+model User{
+  id String @id @default(uuid())
+  email String @unique
+  username String @unique
+  password String
+  fullName String
+  gender Gender
+  dob DateTime
+  role String @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts Post[]
+  comments Comment[]
+  // verificationCodes VerificationCode[]
+}
+
+model Post{
+  id String @id @default(uuid())
+  image String?
+  title String
+  description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author User @relation(fields: [authorId], references: [id])
+  authorId String
+  comments Comment[]
+}
+
+model Comment{
+  id String @id @default(uuid())
+  content String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post Post @relation(fields: [postId], references: [id])
+  postId String
+  author User @relation(fields: [authorId], references: [id])
+  authorId String
+}
+
+// model VerificationCode{
+//   id String @id @default(uuid())
+//   code String
+//   used Boolean @default(false)
+//   createdAt DateTime @default(now())
+
+//   user User @relation(fields: [userId], references: [id])
+//   userId String
+// }
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
